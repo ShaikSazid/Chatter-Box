@@ -7,7 +7,7 @@ export const auth = async (req, res, next) => {
         const token = req.cookies?.token;
         if(!token) return res.status(401).json({ msg: "Not authorized, token missing "});
         const decoded = jwt.verify(token, env.JWT_SECRET);
-        const user = await User.findById(decoded.id);
+        const user = await User.findById(decoded.id).select("-password");
         if(!user) return res.status(401).json({ msg: "Not authorized, user not found" });
         req.user = { id: user._id };
         next();
