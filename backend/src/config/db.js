@@ -10,6 +10,4 @@ const connectToDB = async () => {
     }
 };
 
-console.log("MONGO_URI:", env.MONGO_URI);
-
 export default connectToDB;
