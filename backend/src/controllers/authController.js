@@ -2,6 +2,13 @@ import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import env from "../config/config.js";
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: env.NODE_ENV === "production",
+  sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000
+};
+
 export const signup = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
@@ -11,7 +18,7 @@ export const signup = async (req, res, next) => {
         const newUser = new User({ email, username, password });
         await newUser.save();
         const token = jwt.sign({ id: newUser._id }, env.JWT_SECRET, { expiresIn: "7d" });
-        res.cookie("token", token, { httpOnly: true, secure: env.NODE_ENV === "production", maxAge: 24 * 60 * 60 * 1000, sameSite: "production" ? "none" : "lax" });
+        res.cookie("token", token, cookieOptions);
         return res.status(201).json({ msg: "Signed up successfully", user: { id: newUser._id, username: newUser.username }});
     } catch (err) {
         next(err);
@@ -27,7 +34,7 @@ export const login = async (req, res, next) => {
         const isMatch = await user.comparePassword(password);
         if(!isMatch) return res.status(400).json({msg: "Invalid username or password" });
         const token = jwt.sign({ id: user._id }, env.JWT_SECRET, { expiresIn: "7d" });
-        res.cookie("token", token, { httpOnly: true, secure: env.NODE_ENV === "production", maxAge: 24 * 60 * 60 * 1000, sameSite: "production" ? "none" : "lax" });
+        res.cookie("token", token, cookieOptions);
         return res.status(200).json({ msg: "Logged in successfully", user: { id: user._id, username: user.username }});
     } catch (err) {
         next(err);

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import MessageSchema from "./messageModel.js";
 
 const ThreadSchema = new mongoose.Schema({
-    user: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true
@@ -12,13 +12,6 @@ const ThreadSchema = new mongoose.Schema({
         default: "New Chat"
     },
     messages: [MessageSchema],
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
-});
-
-ThreadSchema.pre("save", async function (next) {
-    this.updatedAt = Date.now();
-    next();
-});
+}, { timestamps: true });
 
 export default mongoose.model("Thread", ThreadSchema);
