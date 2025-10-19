@@ -1,11 +1,14 @@
+// PASTE THIS ENTIRE CODE INTO YOUR BACKEND's src/controllers/authController.js
+
 import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import env from "../config/config.js";
 
+// This is the corrected configuration for cross-domain cookies.
 const cookieOptions = {
   httpOnly: true,
-  secure: env.NODE_ENV === "production",
-  sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+  secure: true,      // MUST be true for cross-site cookies, required by browsers
+  sameSite: "none",  // MUST be 'none' for requests from different domains
   maxAge: 7 * 24 * 60 * 60 * 1000
 };
 
@@ -18,6 +21,7 @@ export const signup = async (req, res, next) => {
         const newUser = new User({ email, username, password });
         await newUser.save();
         const token = jwt.sign({ id: newUser._id }, env.JWT_SECRET, { expiresIn: "7d" });
+        // Use the corrected cookie options
         res.cookie("token", token, cookieOptions);
         return res.status(201).json({ msg: "Signed up successfully", user: { id: newUser._id, username: newUser.username }});
     } catch (err) {
@@ -32,8 +36,9 @@ export const login = async (req, res, next) => {
         const user = await User.findOne({ email });
         if(!user) return res.status(400).json({ msg: "Invalid username or password" });
         const isMatch = await user.comparePassword(password);
-        if(!isMatch) return res.status(400).json({msg: "Invalid username or password" });
+        if(!isMatch) return res.status(400).json({ msg: "Invalid username or password" });
         const token = jwt.sign({ id: user._id }, env.JWT_SECRET, { expiresIn: "7d" });
+        // Use the corrected cookie options
         res.cookie("token", token, cookieOptions);
         return res.status(200).json({ msg: "Logged in successfully", user: { id: user._id, username: user.username }});
     } catch (err) {
@@ -42,6 +47,7 @@ export const login = async (req, res, next) => {
 }
 
 export const logout = (req, res, next) => {
-    res.clearCookie("token", {httpOnly: true, secure: env.NODE_ENV === "production", sameSite: "lax" });
+    // Ensure clearCookie uses the exact same options to guarantee removal
+    res.clearCookie("token", cookieOptions);
     return res.status(200).json({ msg: "Logged out successfully" });
 }
