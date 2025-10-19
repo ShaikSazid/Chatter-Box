@@ -6,7 +6,7 @@ import TypingIndicator from '../components/chat/TypingIndicator';
 import { useChat } from '../context/ChatContext';
 import Icon from '../components/ui/Icon';
 
-const ChatWindow: React.FC = () => {
+const ChatWindow: React.FC<{onToggleSidebar: () => void}> = ({onToggleSidebar}) => {
     const { messages, currentThread, isSending, isLoading } = useChat();
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -37,7 +37,10 @@ const ChatWindow: React.FC = () => {
     return (
         <div className="flex-1 flex flex-col bg-gray-800/30 min-h-0">
             <div className="flex-1 overflow-y-auto">
-                <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-4">
+                 <button onClick={onToggleSidebar} className="md:hidden absolute top-4 left-4 z-10 p-2 bg-gray-800 border border-gray-700 rounded-full text-white">
+                    <Icon name="chevrons-left" className="w-5 h-5 rotate-180" />
+                </button>
+                <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-4 pt-16 md:pt-6">
                     {messages.map((msg) => (
                         <ChatMessage key={msg._id} message={msg} />
                     ))}
@@ -59,8 +62,8 @@ const DashboardPage: React.FC = () => {
         isSidebarOpen={isSidebarOpen} 
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)} 
       />
-      <main className="flex-1 flex flex-col min-h-0">
-        <ChatWindow />
+      <main className="flex-1 flex flex-col min-h-0 relative">
+        <ChatWindow onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
       </main>
     </div>
   );
