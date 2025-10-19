@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import api from '../services/api';
 import type { User } from '../types';
-import axios from 'axios';
 
 interface AuthContextType {
   user: User | null;
@@ -22,36 +21,53 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+const USER_STORAGE_KEY = 'chatterbox_user';
 
-  const verifyUser = useCallback(async () => {
-    setIsLoading(true);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const getInitialUser = (): User | null => {
     try {
-      const { data } = await api.get('/auth/verify');
-      if (data.user) {
-        setUser(data.user);
-        setIsAuthenticated(true);
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
-      }
+      const item = window.localStorage.getItem(USER_STORAGE_KEY);
+      return item ? JSON.parse(item) : null;
     } catch (error) {
-      setUser(null);
-      setIsAuthenticated(false);
-      console.error('Verification failed. This could be a network issue or a problem with the backend server.');
-      if (axios.isAxiosError(error)) {
-        if (error.message === 'Network Error') {
-            console.error('Hint: A "Network Error" often means the backend server (expected at http://localhost:8080) is not running or is unreachable from the browser. Please ensure your backend server is active and that there are no CORS issues.');
-        } else {
-            console.error('Axios error details:', error.toJSON());
-        }
-      } else {
-        console.error('Non-Axios error:', error);
-      }
-    } finally {
+      console.error('Error reading user from localStorage', error);
+      return null;
+    }
+  };
+
+  const initialUser = getInitialUser();
+  
+  const [user, setUser] = useState<User | null>(initialUser);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!initialUser);
+  // Only show the initial loading state if there's no user persisted.
+  // If there is a user, we render the app optimistically while we verify.
+  const [isLoading, setIsLoading] = useState<boolean>(!initialUser);
+
+  const handleSessionUpdate = (userData: User | null) => {
+    setUser(userData);
+    setIsAuthenticated(!!userData);
+    if (userData) {
+      window.localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
+    } else {
+      window.localStorage.removeItem(USER_STORAGE_KEY);
+    }
+  };
+  
+  const verifyUser = useCallback(async () => {
+    const storedUser = getInitialUser();
+    if (!storedUser) {
+        setIsLoading(false); // Ensure loading is false if no user to check
+        return;
+    }
+
+    try {
+      // Quietly verify in the background. If this fails, it will throw an error.
+      await api.get('/auth/verify');
+      // If we are here, the session is valid. State is already correct from the optimistic load.
+      // We just need to turn off the loading spinner if it was on.
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Session verification failed, logging out.", error);
+      handleSessionUpdate(null);
       setIsLoading(false);
     }
   }, []);
@@ -62,20 +78,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (credentials: object) => {
     const { data } = await api.post('/auth/login', credentials);
-    setUser(data.user);
-    setIsAuthenticated(true);
+    handleSessionUpdate(data.user);
   };
 
   const signup = async (details: object) => {
     const { data } = await api.post('/auth/signup', details);
-    setUser(data.user);
-    setIsAuthenticated(true);
+    handleSessionUpdate(data.user);
   };
 
   const logout = async () => {
-    await api.post('/auth/logout');
-    setUser(null);
-    setIsAuthenticated(false);
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error("Logout API call failed, clearing session locally.", error);
+    } finally {
+      handleSessionUpdate(null);
+    }
   };
 
   return (
