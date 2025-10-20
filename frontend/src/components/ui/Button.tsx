@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Spinner from './Spinner';
 
@@ -6,21 +5,16 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, children, isLoading, ...props }, ref) => {
-    return (
-      <button
-        className={`w-full flex items-center justify-center px-6 py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ${className}`}
-        ref={ref}
-        disabled={isLoading}
-        {...props}
-      >
-        {isLoading ? <Spinner /> : children}
-      </button>
-    );
-  }
-);
-
-Button.displayName = 'Button';
+const Button: React.FC<ButtonProps> = ({ children, className = '', isLoading = false, ...props }) => {
+  return (
+    <button
+      className={`w-full flex justify-center items-center bg-gray-600 hover:bg-gray-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 ${className}`}
+      disabled={isLoading || props.disabled}
+      {...props}
+    >
+      {isLoading ? <Spinner /> : children}
+    </button>
+  );
+};
 
 export default Button;

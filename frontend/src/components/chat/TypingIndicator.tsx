@@ -1,39 +1,21 @@
-
 import React from 'react';
-import { motion } from 'framer-motion';
 import Icon from '../ui/Icon';
 
 const TypingIndicator: React.FC = () => {
-  const dotVariants = {
-    initial: {
-      y: 0,
-    },
-    animate: {
-      y: [0, -4, 0],
-      transition: {
-        duration: 0.8,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      },
-    },
-  };
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="flex items-start gap-4 p-4 md:p-6"
-    >
-      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-600">
-        <Icon name="bot" className="w-5 h-5 text-white" />
-      </div>
-      <div className="flex items-center gap-1.5 pt-3">
-        <motion.div variants={dotVariants} initial="initial" animate="animate" className="w-2 h-2 bg-gray-400 rounded-full" style={{ animationDelay: '0s' }} />
-        <motion.div variants={dotVariants} initial="initial" animate="animate" className="w-2 h-2 bg-gray-400 rounded-full" style={{ animationDelay: '0.2s' }} />
-        <motion.div variants={dotVariants} initial="initial" animate="animate" className="w-2 h-2 bg-gray-400 rounded-full" style={{ animationDelay: '0.4s' }} />
-      </div>
-    </motion.div>
+    <div className="flex items-start gap-4 my-6">
+        <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center bg-gray-600">
+            <Icon name="bot" className="w-5 h-5" />
+        </div>
+        <div className="flex flex-col items-start">
+            <span className="font-bold text-sm mb-1 text-gray-400">Assistant</span>
+            <div className="p-4 rounded-lg bg-gray-700/50 border border-gray-700 flex items-center space-x-1.5">
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:0s]"></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:0.15s]"></span>
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:0.3s]"></span>
+            </div>
+        </div>
+    </div>
   );
 };
 

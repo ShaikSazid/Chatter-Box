@@ -1,48 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useChat } from '../../context/ChatContext';
 import Icon from '../ui/Icon';
+import Spinner from '../ui/Spinner';
 
 const ChatInput: React.FC = () => {
   const [content, setContent] = useState('');
-  const { sendMessage, isSending } = useChat();
+  const { sendMessage, isSending, currentThread } = useChat();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto'; // Reset height to shrink if text is deleted
+      const scrollHeight = textarea.scrollHeight;
+      // Set a max height (e.g., 200px)
+      textarea.style.height = `${Math.min(scrollHeight, 200)}px`;
+    }
+  }, [content]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (content.trim() && !isSending) {
-      sendMessage(content);
+    if (content.trim() && !isSending && currentThread) {
+      sendMessage(content.trim());
       setContent('');
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      // Safe to cast here because we prevent default and call the form handler
+      handleSubmit(e as unknown as React.FormEvent);
+    }
+  };
+
   return (
-    <div className="p-4 bg-gray-900 border-t border-gray-700/50">
-      <form
-        onSubmit={handleSubmit}
-        className="relative"
+    <form onSubmit={handleSubmit} className="relative">
+      <textarea
+        ref={textareaRef}
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={currentThread ? 'Type your message...' : 'Start a new chat to begin'}
+        className="w-full bg-gray-700 border border-transparent rounded-lg p-4 pr-16 text-white resize-none focus:outline-none focus:ring-2 focus:ring-gray-600 transition-all overflow-y-auto"
+        rows={1}
+        disabled={isSending || !currentThread}
+      />
+      <button
+        type="submit"
+        disabled={isSending || !content.trim() || !currentThread}
+        className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-gray-600 hover:bg-gray-500 disabled:bg-gray-700/50 disabled:text-gray-500 disabled:cursor-not-allowed rounded-full transition-colors"
+        title="Send message"
       >
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSubmit(e);
-            }
-          }}
-          placeholder="Type your message..."
-          rows={1}
-          className="w-full pl-4 pr-12 py-3 bg-gray-800 border border-gray-700 rounded-lg resize-none placeholder-gray-500 text-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all duration-300"
-          disabled={isSending}
-        />
-        <button
-          type="submit"
-          disabled={isSending || !content.trim()}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
-        >
-          <Icon name="send" className="w-5 h-5" />
-        </button>
-      </form>
-    </div>
+        {isSending ? <Spinner size="w-5 h-5" /> : <Icon name="send" className="w-5 h-5" />}
+      </button>
+    </form>
   );
 };
 
