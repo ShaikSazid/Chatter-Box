@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-// FIX: Corrected the import path for the useAuth hook.
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useChat } from '../../context/ChatContext';
 import Icon from '../ui/Icon';
@@ -8,12 +7,19 @@ import Button from '../ui/Button';
 import { motion, type Variants } from 'framer-motion';
 
 const Sidebar: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { threads, currentThread, selectThread, createThread, deleteThread } = useChat();
-  
+
   const [isOpen, setIsOpen] = useState(true);
   const [threadToDelete, setThreadToDelete] = useState<string | null>(null);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  // Auto-select the first thread if none is selected
+  useEffect(() => {
+    if (threads.length > 0 && !currentThread) {
+      selectThread(threads[0]._id);
+    }
+  }, [threads, currentThread, selectThread]);
 
   const handleCreateThread = async () => {
     await createThread();
@@ -26,35 +32,40 @@ const Sidebar: React.FC = () => {
       setThreadToDelete(null);
     }
   };
-  
+
   const handleLogoutConfirm = () => {
     logout();
     setIsLogoutModalOpen(false);
   };
 
-  // FIX: Explicitly typed the variants with Variants from framer-motion to resolve type inference issues.
   const sidebarVariants: Variants = {
-    open: { width: "16rem", transition: { type: "spring", stiffness: 400, damping: 40 } },
-    closed: { width: "5rem", transition: { type: "spring", stiffness: 400, damping: 40 } },
+    open: { width: '16rem', transition: { type: 'spring', stiffness: 400, damping: 40 } },
+    closed: { width: '5rem', transition: { type: 'spring', stiffness: 400, damping: 40 } },
   };
 
-  // FIX: Explicitly typed the variants with Variants from framer-motion to resolve type inference issues.
   const contentFadeVariants: Variants = {
-    open: { opacity: 1, x: 0, transition: { delay: 0.2, duration: 0.2, ease: "easeIn" } },
-    closed: { opacity: 0, x: -10, transition: { duration: 0.1, ease: "easeOut" } },
+    open: { opacity: 1, x: 0, transition: { delay: 0.2, duration: 0.2, ease: 'easeIn' } },
+    closed: { opacity: 0, x: -10, transition: { duration: 0.1, ease: 'easeOut' } },
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full w-64 bg-gray-900">
+        <span className="text-gray-400">Loading...</span>
+      </div>
+    );
+  }
 
   return (
     <>
       <motion.aside
         variants={sidebarVariants}
-        animate={isOpen ? "open" : "closed"}
+        animate={isOpen ? 'open' : 'closed'}
         className="bg-gray-900 flex flex-col p-2 border-r border-white/10"
       >
         <div className="h-full flex flex-col overflow-hidden">
           {isOpen ? (
-            /* --- EXPANDED VIEW --- */
-            <motion.div 
+            <motion.div
               className="flex flex-col h-full"
               key="sidebar-open"
               variants={contentFadeVariants}
@@ -62,33 +73,41 @@ const Sidebar: React.FC = () => {
               animate="open"
               exit="closed"
             >
+              {/* Header */}
               <div className="flex items-center justify-between p-2 mb-2">
                 <div className="flex items-center gap-2">
-                  <Icon name="chatterbox" className="w-6 h-6 text-gray-400"/>
+                  <Icon name="chatterbox" className="w-6 h-6 text-gray-400" />
                   <span className="font-bold text-lg text-white">ChatterBox</span>
                 </div>
-                <button onClick={() => setIsOpen(false)} className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700/50" title="Collapse">
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700/50"
+                  title="Collapse"
+                >
                   <Icon name="chevrons-left" className="w-5 h-5" />
                 </button>
               </div>
-              
+
+              {/* New Chat Button */}
               <div className="p-2 mb-2">
                 <button
                   onClick={handleCreateThread}
                   className="w-full flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+                  title="New Chat"
                 >
                   <Icon name="plus" className="w-5 h-5" />
                   New Chat
                 </button>
               </div>
 
+              {/* Threads List */}
               <div className="flex-1 overflow-y-auto pr-2 -mr-2">
                 <nav className="flex flex-col gap-1">
-                  {threads.map((thread) => (
+                  {threads.map(thread => (
                     <div key={thread._id} className="group relative">
                       <a
                         href="#"
-                        onClick={(e) => { e.preventDefault(); selectThread(thread._id); }}
+                        onClick={e => { e.preventDefault(); selectThread(thread._id); }}
                         className={`block py-2 px-3 rounded-md text-sm truncate transition-colors ${
                           currentThread?._id === thread._id
                             ? 'bg-gray-700/80 text-white'
@@ -109,21 +128,25 @@ const Sidebar: React.FC = () => {
                 </nav>
               </div>
 
+              {/* Footer */}
               <div className="mt-auto p-2 border-t border-white/10">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-600">
                     <Icon name="user" className="w-5 h-5" />
                   </div>
                   <span className="font-semibold text-sm flex-1 truncate">{user?.username}</span>
-                  <button onClick={() => setIsLogoutModalOpen(true)} className="p-2 text-gray-400 hover:text-white" title="Logout">
+                  <button
+                    onClick={() => setIsLogoutModalOpen(true)}
+                    className="p-2 text-gray-400 hover:text-white"
+                    title="Logout"
+                  >
                     <Icon name="logout" className="w-5 h-5" />
                   </button>
                 </div>
               </div>
             </motion.div>
           ) : (
-            /* --- COLLAPSED VIEW --- */
-            <motion.div 
+            <motion.div
               className="flex flex-col items-center h-full pt-4 gap-6"
               key="sidebar-closed"
               variants={contentFadeVariants}
@@ -131,16 +154,21 @@ const Sidebar: React.FC = () => {
               animate="open"
               exit="closed"
             >
-              {/* Top: Logo */}
               <div className="w-10 h-10 flex items-center justify-center text-gray-400">
                 <Icon name="chatterbox" className="w-8 h-8" />
               </div>
-              {/* Middle: Toggle */}
-              <button onClick={() => setIsOpen(true)} className="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg" title="Expand">
+              <button
+                onClick={() => setIsOpen(true)}
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg"
+                title="Expand"
+              >
                 <Icon name="menu" className="w-6 h-6" />
               </button>
-              {/* Bottom of top group: New Chat */}
-              <button onClick={handleCreateThread} className="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg" title="New Chat">
+              <button
+                onClick={handleCreateThread}
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-lg"
+                title="New Chat"
+              >
                 <Icon name="plus" className="w-6 h-6" />
               </button>
             </motion.div>
@@ -148,7 +176,7 @@ const Sidebar: React.FC = () => {
         </div>
       </motion.aside>
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Thread Modal */}
       <Modal
         isOpen={!!threadToDelete}
         onClose={() => setThreadToDelete(null)}
@@ -167,7 +195,7 @@ const Sidebar: React.FC = () => {
         </div>
       </Modal>
 
-      {/* Logout Confirmation Modal */}
+      {/* Logout Modal */}
       <Modal
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}

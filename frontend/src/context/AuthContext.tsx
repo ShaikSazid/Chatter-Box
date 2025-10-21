@@ -35,22 +35,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const navigate = useNavigate();
   const verifyUser = useCallback(async () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        // The interceptor will add the token
-        const { data } = await api.get("/auth/me");
-        setUser(data.user);
-        setIsAuthenticated(true);
-      } catch (error) {
-        console.error("Token verification failed", error);
-        localStorage.removeItem("token");
-        setUser(null);
-        setIsAuthenticated(false);
-      }
-    }
+  try {
+    const { data } = await api.get("/auth/verify"); // cookie sent automatically
+    setUser(data.user);
+    setIsAuthenticated(true);
+  } catch (error) {
+    setUser(null);
+    setIsAuthenticated(false);
+  } finally {
     setIsLoading(false);
-  }, []);
+  }
+}, []);
   useEffect(() => {
     verifyUser();
   }, [verifyUser]);
