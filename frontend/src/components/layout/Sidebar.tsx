@@ -17,7 +17,7 @@ const Sidebar: React.FC = () => {
 
   const handleCreateThread = async () => {
     await createThread();
-    if (!isOpen) setIsOpen(true); // Expand sidebar on new chat
+    if (!isOpen) setIsOpen(true);
   };
 
   const handleDeleteConfirm = () => {
