@@ -2,39 +2,39 @@ import Thread from "../models/threadModel.js";
 import { getAiResponse, generateTitle } from "../services/aiService.js";
 
 export const sendMessage = async (req, res, next) => {
-    try {
-        const { threadId, content } = req.body;
-        let thread;
-        let newTitle;
+  try {
+    const { threadId, content } = req.body;
 
-        if (threadId) {
-            thread = await Thread.findOne({ _id: threadId, userId: req.user.id });
-            if (!thread) return res.status(404).json({ msg: "Thread not found" });
-        } else {
-            // This case is not used by the current frontend but is good practice to handle.
-            thread = new Thread({ userId: req.user.id });
-        }
-
-        // Check if this is the first user message in a new chat
-        const isNewChat = thread.messages.length === 0;
-
-        thread.messages.push({ role: "user", content });
-
-        const assistantResponse = await getAiResponse(thread.messages);
-        thread.messages.push({ role: "assistant", content: assistantResponse });
-
-        // If it's a new chat, generate a title
-        if (isNewChat) {
-            const title = await generateTitle(content, assistantResponse);
-            thread.title = title;
-            newTitle = title;
-        }
-
-        await thread.save();
-
-        // Send back the structured response the frontend expects
-        res.status(200).json({ assistantResponse, newTitle });
-    } catch (err) {
-        next(err);
+    if (!threadId) {
+      return res.status(400).json({ msg: "threadId is required" });
     }
+
+    const thread = await Thread.findOne({ _id: threadId, userId: req.user.id });
+    if (!thread) return res.status(404).json({ msg: "Thread not found" });
+
+    const isNewChat = thread.messages.length === 0;
+
+    // Add user message
+    thread.messages.push({ role: "user", content });
+
+    // Get AI response
+    const assistantResponse = await getAiResponse(thread.messages);
+    thread.messages.push({ role: "assistant", content: assistantResponse });
+
+    // Generate title if first message
+    if (isNewChat) {
+      const title = await generateTitle(content, assistantResponse);
+      thread.title = title;
+    }
+
+    await thread.save();
+
+    res.status(200).json({
+      assistantResponse,
+      newTitle: isNewChat ? thread.title : null
+    });
+
+  } catch (err) {
+    next(err);
+  }
 };

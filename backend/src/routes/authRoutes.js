@@ -11,8 +11,10 @@ router.post("/signup", validate(signupSchema) ,signup);
 router.post("/login", validate(loginSchema), login);
 router.post("/logout", logout);
 router.get("/verify", auth, async (req, res) => {
-    const user = await User.findById(req.user.id).select("name email role");
-    res.json({ user });
+  const user = await User.findById(req.user.id).select("username email"); // pick username
+  if (!user) return res.status(404).json({ msg: "User not found" });
+
+  res.json({ user: { id: user._id, username: user.username } }); // same shape as login/signup
 });
 
 export default router;

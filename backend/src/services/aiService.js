@@ -4,7 +4,6 @@ import env from "../config/config.js";
 const ai = new GoogleGenAI({ apiKey: env.API_KEY });
 const model = 'gemini-2.5-flash';
 
-// Converts the app's message history format to the format expected by the Gemini API.
 const buildGeminiHistory = (messages) => {
     return messages.map(msg => ({
         role: msg.role === 'assistant' ? 'model' : 'user',
@@ -19,7 +18,7 @@ const buildGeminiHistory = (messages) => {
  */
 export const getAiResponse = async (messages) => {
     try {
-        const history = buildGeminiHistory(messages.slice(0, -1)); // History is all but the last message
+        const history = buildGeminiHistory(messages.slice(0, -1)); 
         const lastMessage = messages[messages.length - 1];
 
         const chat = ai.chats.create({
@@ -35,12 +34,7 @@ export const getAiResponse = async (messages) => {
     }
 };
 
-/**
- * Generates a concise title for a conversation.
- * @param {string} userPrompt - The user's initial message.
- * @param {string} modelResponse - The model's first response.
- * @returns {Promise<string>} - A short, relevant title.
- */
+
 export const generateTitle = async (userPrompt, modelResponse) => {
     try {
         const prompt = `Based on the following conversation, create a short, concise title (3-5 words).
@@ -54,7 +48,6 @@ export const generateTitle = async (userPrompt, modelResponse) => {
             contents: prompt,
         });
 
-        // Clean up the title, removing quotes and extra words
         let title = response.text.trim().replace(/["']/g, '');
         if (title.toLowerCase().startsWith('title:')) {
             title = title.substring(6).trim();
@@ -62,6 +55,6 @@ export const generateTitle = async (userPrompt, modelResponse) => {
         return title;
     } catch (err) {
         console.error("Gemini API error in generateTitle:", err);
-        return "New Chat"; // Fallback title
+        return "New Chat"; 
     }
 };

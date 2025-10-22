@@ -7,8 +7,8 @@ import env from "../config/config.js";
 // This is the corrected configuration for cross-domain cookies.
 const cookieOptions = {
   httpOnly: true,
-  secure: true,      // MUST be true for cross-site cookies, required by browsers
-  sameSite: "none",  // MUST be 'none' for requests from different domains
+  secure: false,      // MUST be true for cross-site cookies, required by browsers
+  sameSite: "lax",  // MUST be 'none' for requests from different domains
   maxAge: 7 * 24 * 60 * 60 * 1000
 };
 

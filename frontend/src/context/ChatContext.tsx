@@ -26,7 +26,6 @@ export const useChat = () => {
 
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
-
   const [threads, setThreads] = useState<Thread[]>([]);
   const [currentThread, setCurrentThread] = useState<Thread | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -47,8 +46,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [isAuthenticated]);
 
   useEffect(() => {
-    fetchThreads();
-  }, [fetchThreads]);
+    if (isAuthenticated) fetchThreads();
+  }, [isAuthenticated, fetchThreads]);
 
   const selectThread = async (threadId: string | null) => {
     if (!threadId) {

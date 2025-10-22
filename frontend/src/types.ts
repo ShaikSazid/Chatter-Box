@@ -19,3 +19,9 @@ export interface Thread {
   createdAt: string;
   updatedAt: string;
 }
+
+export type Block =
+  | { type: "text"; content: string }
+  | { type: "list"; content: string[] }
+  | { type: "table"; content: string[][] }
+  | { type: "code"; content: string };
