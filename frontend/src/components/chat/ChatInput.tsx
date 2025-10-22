@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useChat } from "../../context/ChatContext";
+import { useChat } from "../../hooks/useChat";
 import Icon from "../ui/Icon";
 import Spinner from "../ui/Spinner";
 

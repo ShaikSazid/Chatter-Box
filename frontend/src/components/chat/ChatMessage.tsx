@@ -12,12 +12,12 @@ interface ChatMessageProps {
   message?: Message;
 }
 
-const CodeBlock: React.FC<{ inline: boolean; className?: string; children: string[]; isUser?: boolean }> = ({
-  inline,
-  className,
-  children,
-  isUser,
-}) => {
+const CodeBlock: React.FC<{
+  inline: boolean;
+  className?: string;
+  children: string[];
+  isUser?: boolean;
+}> = ({ inline, className, children, isUser }) => {
   const match = /language-(\w+)/.exec(className || '');
   return !inline && match ? (
     <SyntaxHighlighter
@@ -29,6 +29,7 @@ const CodeBlock: React.FC<{ inline: boolean; className?: string; children: strin
         padding: 12,
         margin: '12px 0',
         overflowX: 'auto',
+        backgroundColor: isUser ? '#323437FF' : '#292A2DFF',
       }}
       showLineNumbers
       wrapLines
@@ -41,8 +42,9 @@ const CodeBlock: React.FC<{ inline: boolean; className?: string; children: strin
     <code
       className="inline-code font-mono rounded px-1 py-0.5"
       style={{
-        backgroundColor: '#323437',
+        backgroundColor: '#323437FF',
         color: '#f5f5f5',
+        fontSize: '0.9rem',
       }}
     >
       {children}
@@ -70,27 +72,61 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             <span
               className="rounded px-1 py-0.5 font-semibold"
               style={{
-                backgroundColor: '#323437',
-                color: '#f9fafb', // text-gray-50
+                backgroundColor: '#45494E',
+                color: '#f9fafb',
               }}
             >
               {children}
             </span>
           ),
-          p: ({ children }) => <p className="break-words whitespace-pre-wrap mb-2">{children}</p>,
+          p: ({ children }) => (
+            <p className="break-words whitespace-pre-wrap leading-relaxed">{children}</p>
+          ),
           a: ({ href, children }) => (
-            <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 underline"
+            >
               {children}
             </a>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-gray-500 pl-4 italic text-gray-400 my-3">{children}</blockquote>
+            <blockquote className="border-l-4 border-gray-500 pl-4 italic text-gray-400 my-2">
+              {children}
+            </blockquote>
           ),
-          ul: ({ children }) => <ul className="list-disc list-inside mb-2 text-gray-200 space-y-0.5">{children}</ul>,
-          ol: ({ children }) => <ol className="list-decimal list-inside mb-2 text-gray-200 space-y-0.5">{children}</ol>,
-          li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+          ul: ({ children }) => (
+            <ul className="list-disc list-inside mb-2 text-gray-200 space-y-0.5">{children}</ul>
+          ),
+          ol: ({ children }) => (
+            <ol className="list-decimal list-inside mb-2 text-gray-200 space-y-0.5">{children}</ol>
+          ),
+          li: ({ children }) => <li className="leading-snug">{children}</li>,
           img: ({ alt, src }) => (
-            <img src={src} alt={alt} loading="lazy" style={{ maxWidth: '100%', borderRadius: 8, margin: '0.5rem 0' }} />
+            <img
+              src={src}
+              alt={alt}
+              loading="lazy"
+              style={{ maxWidth: '100%', borderRadius: 8, margin: '0.25rem 0' }}
+            />
+          ),
+          table: ({ children }) => (
+            <div className="overflow-x-auto scrollbar-modern mb-3 rounded-md border border-gray-600">
+              <table className="w-full border-collapse text-sm text-gray-100">{children}</table>
+            </div>
+          ),
+          thead: ({ children }) => <thead className="bg-gray-700">{children}</thead>,
+          th: ({ children }) => (
+            <th className="border border-gray-600 px-2 py-1 text-left">{children}</th>
+          ),
+          tbody: ({ children }) => <tbody>{children}</tbody>,
+          tr: ({ children }) => (
+            <tr className="border-b border-gray-600 last:border-0 hover:bg-gray-800">{children}</tr>
+          ),
+          td: ({ children }) => (
+            <td className="border border-gray-600 px-2 py-1 align-top">{children}</td>
           ),
         }}
       />
@@ -100,11 +136,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   return (
     <div
       aria-live="polite"
-      className={`flex ${isUser ? 'justify-end' : 'justify-start'} my-3`}
+      className={`flex my-2 ${isUser ? 'justify-end' : 'justify-start'}`}
       role="listitem"
       tabIndex={0}
     >
-      <div className={`flex items-start gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+      <div
+        className={`flex items-start gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
+        style={{ maxWidth: '70%' }}
+      >
         {/* Avatar */}
         <div
           className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-600"
@@ -115,15 +154,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
 
         {/* Message bubble */}
         <div
-          className={`rounded-xl`}
+          className="rounded-xl"
           style={{
             backgroundColor: isUser ? '#323437FF' : '#292A2DFF',
             color: isUser ? '#eee' : '#e5e7eb',
-            padding: isUser ? '1rem' : '0.75rem',
-            maxWidth: '70%',
-            width: 'fit-content',
+            padding: '0.75rem 1rem',
+            width: '100%', // fills the flex container but stays maxWidth 70% due to parent
             wordBreak: 'break-word',
             whiteSpace: 'pre-wrap',
+            overflowWrap: 'anywhere',
           }}
         >
           {parsedContent}
