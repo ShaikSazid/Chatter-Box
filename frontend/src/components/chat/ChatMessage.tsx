@@ -1,50 +1,56 @@
-import React, { useMemo } from 'react';
-import type { Message } from '../../types';
-import Icon from '../ui/Icon';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeSanitize from 'rehype-sanitize';
-import rehypeRaw from 'rehype-raw';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import React, { useMemo } from "react";
+import type { Message } from "../../types";
+import Icon from "../ui/Icon";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeSanitize from "rehype-sanitize";
+import rehypeRaw from "rehype-raw";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 interface ChatMessageProps {
   message?: Message;
 }
 
-const CodeBlock: React.FC<{
+interface CodeBlockProps {
   inline: boolean;
   className?: string;
   children: string[];
   isUser?: boolean;
-}> = ({ inline, className, children, isUser }) => {
-  const match = /language-(\w+)/.exec(className || '');
-  return !inline && match ? (
-    <SyntaxHighlighter
-      style={oneDark}
-      language={match[1]}
-      PreTag="div"
-      customStyle={{
-        borderRadius: 6,
-        padding: 12,
-        margin: '12px 0',
-        overflowX: 'auto',
-        backgroundColor: isUser ? '#323437FF' : '#292A2DFF',
-      }}
-      showLineNumbers
-      wrapLines
-      lineProps={{ style: { wordBreak: 'break-word' } }}
-      className="modern-scrollbar"
-    >
-      {String(children).replace(/\n$/, '')}
-    </SyntaxHighlighter>
-  ) : (
+}
+
+const CodeBlock: React.FC<CodeBlockProps> = ({ inline, className, children, isUser }) => {
+  const match = /language-(\w+)/.exec(className || "");
+  if (!inline && match) {
+    return (
+      <SyntaxHighlighter
+        style={oneDark}
+        language={match[1]}
+        PreTag="div"
+        customStyle={{
+          borderRadius: 6,
+          padding: 12,
+          margin: "12px 0",
+          overflowX: "auto",
+          backgroundColor: isUser ? "#323437FF" : "#292A2DFF",
+        }}
+        showLineNumbers
+        wrapLines
+        lineProps={{ style: { wordBreak: "break-word" } }}
+        className="modern-scrollbar"
+      >
+        {String(children).replace(/\n$/, "")}
+      </SyntaxHighlighter>
+    );
+  }
+
+  return (
     <code
       className="inline-code font-mono rounded px-1 py-0.5"
       style={{
-        backgroundColor: '#323437FF',
-        color: '#f5f5f5',
-        fontSize: '0.9rem',
+        backgroundColor: "#323437FF",
+        color: "#f5f5f5",
+        fontSize: "0.9rem",
       }}
     >
       {children}
@@ -54,26 +60,30 @@ const CodeBlock: React.FC<{
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   if (!message) return null;
-  const isUser = message.role === 'user';
+
+  const isUser = message.role === "user";
 
   const parsedContent = useMemo(() => {
     return (
       <ReactMarkdown
-        children={message.content || ''}
+        children={message.content || ""}
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSanitize]}
         components={{
           code: ({ inline, className, children }) => (
-            <CodeBlock inline={inline} className={className} isUser={isUser}>
-              {Array.isArray(children) ? children : [children]}
-            </CodeBlock>
+            <CodeBlock
+              inline={!!inline}
+              className={className || undefined}
+              isUser={isUser}
+              children={Array.isArray(children) ? children : [children]}
+            />
           ),
           strong: ({ children }) => (
             <span
               className="rounded px-1 py-0.5 font-semibold"
               style={{
-                backgroundColor: '#45494E',
-                color: '#f9fafb',
+                backgroundColor: "#45494E",
+                color: "#f9fafb",
               }}
             >
               {children}
@@ -109,7 +119,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
               src={src}
               alt={alt}
               loading="lazy"
-              style={{ maxWidth: '100%', borderRadius: 8, margin: '0.25rem 0' }}
+              style={{ maxWidth: "100%", borderRadius: 8, margin: "0.25rem 0" }}
             />
           ),
           table: ({ children }) => (
@@ -136,33 +146,33 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   return (
     <div
       aria-live="polite"
-      className={`flex my-2 ${isUser ? 'justify-end' : 'justify-start'}`}
+      className={`flex my-2 ${isUser ? "justify-end" : "justify-start"}`}
       role="listitem"
       tabIndex={0}
     >
       <div
-        className={`flex items-start gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
-        style={{ maxWidth: '70%' }}
+        className={`flex items-start gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}
+        style={{ maxWidth: "70%" }}
       >
         {/* Avatar */}
         <div
           className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-600"
-          aria-label={isUser ? 'User avatar' : 'Bot avatar'}
+          aria-label={isUser ? "User avatar" : "Bot avatar"}
         >
-          <Icon name={isUser ? 'user' : 'bot'} className="w-5 h-5" />
+          <Icon name={isUser ? "user" : "chatterbox"} className="w-5 h-5" />
         </div>
 
         {/* Message bubble */}
         <div
           className="rounded-xl"
           style={{
-            backgroundColor: isUser ? '#323437FF' : '#292A2DFF',
-            color: isUser ? '#eee' : '#e5e7eb',
-            padding: '0.75rem 1rem',
-            width: '100%', // fills the flex container but stays maxWidth 70% due to parent
-            wordBreak: 'break-word',
-            whiteSpace: 'pre-wrap',
-            overflowWrap: 'anywhere',
+            backgroundColor: isUser ? "#323437FF" : "#292A2DFF",
+            color: isUser ? "#eee" : "#e5e7eb",
+            padding: "0.75rem 1rem",
+            width: "100%",
+            wordBreak: "break-word",
+            whiteSpace: "pre-wrap",
+            overflowWrap: "anywhere",
           }}
         >
           {parsedContent}
