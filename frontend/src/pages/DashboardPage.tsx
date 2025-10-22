@@ -14,8 +14,15 @@ const DashboardPage: React.FC = () => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+  // Smooth scroll to bottom on new messages
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    scrollToBottom();
   }, [messages, isSending]);
 
   useEffect(() => {
@@ -42,22 +49,16 @@ const DashboardPage: React.FC = () => {
     <div className="flex h-screen bg-gray-900 text-white relative">
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
+      {/* Show collapsed sidebar label */}
       {!isSidebarOpen && (
-        <div
-          className="absolute text-[#C4C7C5] font-bold text-[20px]"
-          style={{
-            top: '2.2rem',
-            left: '6rem',
-            fontFamily: 'Helvetica Neue, sans-serif',
-          }}
-        >
+        <div className="absolute left-24 top-8 text-[#C4C7C5] font-bold text-xl select-none">
           ChatterBox
         </div>
       )}
 
       <main className="flex-1 flex flex-col bg-[#1A1D1DFF]">
         <div className="flex-1 overflow-y-auto px-6 pt-6 pb-4 custom-scrollbar">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto space-y-10">
             {currentThread ? (
               <>
                 {messages.map(msg => (

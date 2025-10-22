@@ -13,7 +13,7 @@ const ChatInput: React.FC = () => {
     if (textarea) {
       textarea.style.height = "auto";
       const scrollHeight = textarea.scrollHeight;
-      textarea.style.height = `${Math.min(scrollHeight, 300)}px`; // bigger vertical height
+      textarea.style.height = `${Math.min(scrollHeight, 300)}px`;
     }
   }, [content]);
 
@@ -43,10 +43,8 @@ const ChatInput: React.FC = () => {
         value={content}
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={
-          currentThread ? "Ask ChatterBox" : "Create or select a chat to start conversation"
-        }
-        className="w-full bg-transparent text-white resize-none focus:outline-none px-5 py-6 pr-16 rounded-3xl placeholder-gray-500 text-base leading-relaxed max-h-72 overflow-y-auto" // increased vertical padding
+        placeholder={currentThread ? "Ask ChatterBox" : "Select a chat to start"}
+        className="w-full bg-transparent text-white resize-none focus:outline-none px-5 py-6 pr-16 rounded-3xl placeholder-gray-500 text-base leading-relaxed max-h-72 overflow-y-auto"
         rows={1}
       />
 

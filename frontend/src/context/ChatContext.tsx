@@ -137,7 +137,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ]);
     } finally {
       setIsSending(false);
-      if (currentThread) selectThread(currentThread._id); // refresh messages
+      if (currentThread) selectThread(currentThread._id);
     }
   };
 
