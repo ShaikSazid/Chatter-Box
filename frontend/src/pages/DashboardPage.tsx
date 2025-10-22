@@ -51,7 +51,7 @@ const DashboardPage: React.FC = () => {
 
       {/* Show collapsed sidebar label */}
       {!isSidebarOpen && (
-        <div className="absolute left-24 top-8 text-[#C4C7C5] font-bold text-xl select-none">
+        <div className="absolute left-24 top-11 text-[#C4C7C5] font-bold text-xl select-none">
           ChatterBox
         </div>
       )}

@@ -4,7 +4,7 @@ import { useChat } from '../../context/ChatContext';
 import Icon from '../ui/Icon';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
-import { motion, type Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -39,14 +39,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     setIsLogoutModalOpen(false);
   };
 
-  const sidebarVariants: Variants = {
-    open: { width: '18rem', transition: { type: 'spring', stiffness: 400, damping: 40 } },
-    closed: { width: '5rem', transition: { type: 'spring', stiffness: 400, damping: 40 } },
-  };
-
-  const contentFadeVariants: Variants = {
-    open: { opacity: 1, x: 0, transition: { delay: 0.2, duration: 0.2, ease: 'easeIn' } },
-    closed: { opacity: 0, x: -10, transition: { duration: 0.1, ease: 'easeOut' } },
+  // Sidebar animation variants
+  const sidebarVariants = {
+    open: { width: '18rem', transition: { duration: 0.1, ease: 'easeInOut' } },
+    closed: { width: '5rem', transition: { duration: 0.1, ease: 'easeInOut' } },
   };
 
   if (isLoading) {
@@ -62,27 +58,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       <motion.aside
         variants={sidebarVariants}
         animate={isOpen ? 'open' : 'closed'}
-        className="flex flex-col p-2 border-r border-white/10 relative"
+        onMouseEnter={() => setIsOpen(true)} // expand on hover
+        className="flex flex-col p-2 border-r border-white/10 relative transition-all"
         style={{ backgroundColor: '#292A2D', fontFamily: 'Helvetica Neue, sans-serif' }}
       >
         <div className="h-full flex flex-col overflow-hidden">
           {isOpen ? (
-            <motion.div
-              className="flex flex-col h-full"
-              key="sidebar-open"
-              variants={contentFadeVariants}
-              initial="closed"
-              animate="open"
-              exit="closed"
-            >
-              {/* Top section */}
+            <div className="flex flex-col h-full">
+              {/* Header */}
               <div className="flex items-center justify-between p-2 mb-2">
                 <div className="flex items-center gap-2">
                   <Icon name="chatterbox" className="w-6 h-6 text-[#C4C7C5]" />
                   <span className="font-bold text-xl text-[#C4C7C5]">ChatterBox</span>
                 </div>
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => setIsOpen(false)} // toggle button closes sidebar
                   className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-[#343639FF]"
                   title="Collapse"
                 >
@@ -94,14 +84,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
               <div className="p-2 mb-2">
                 <button
                   onClick={handleCreateThread}
-                  className="w-full flex items-center justify-start gap-2 text-[#C4C7C5] font-semibold py-2 px-4 rounded-xl hover:bg-[#343639FF] transition-all duration-200 text-[14px]"
+                  className="w-full flex items-center justify-start gap-2 text-[#C4C7C5] font-semibold py-2 px-4 rounded-xl hover:bg-[#343639FF] transition-all duration-100 text-[14px]"
                 >
                   <Icon name="plus" className="w-5 h-5" />
                   New Chat
                 </button>
               </div>
 
-              {/* Threads */}
+              {/* Chat Threads */}
               <div className="flex-1 overflow-y-auto pr-2 -mr-2 custom-scrollbar">
                 <nav className="flex flex-col gap-1">
                   {threads.map((thread) => (
@@ -112,12 +102,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                           e.preventDefault();
                           selectThread(thread._id);
                         }}
-                        className={`block py-2 px-3 text-sm truncate transition-all duration-200 text-[#C4C7C5] text-[14px]`}
+                        className={`block py-2 px-3 text-sm truncate transition-all duration-100 text-[#C4C7C5] text-[14px]`}
                         style={{
                           backgroundColor:
                             currentThread?._id === thread._id ? '#1E3660FF' : 'transparent',
                           borderRadius: '1rem',
-                          transition: 'background-color 0.2s ease, border-radius 0.2s ease',
                         }}
                         onMouseEnter={(e) => {
                           if (currentThread?._id !== thread._id)
@@ -132,7 +121,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                       </a>
                       <button
                         onClick={() => setThreadToDelete(thread._id)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-100"
                         title="Delete chat"
                       >
                         <Icon name="trash" className="w-4 h-4" />
@@ -142,10 +131,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 </nav>
               </div>
 
-              {/* Profile and logout */}
+              {/* Profile Section */}
               <div className="mt-auto p-2">
                 <div className="flex items-center gap-3">
-                  {/* Profile icon with initial */}
                   <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-600 text-white font-bold text-lg">
                     {user?.username ? user.username.charAt(0).toUpperCase() : 'U'}
                   </div>
@@ -159,28 +147,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                   </button>
                 </div>
               </div>
-            </motion.div>
+            </div>
           ) : (
-            <motion.div
-              className="flex flex-col items-center h-full pt-4 justify-between"
-              key="sidebar-closed"
-              variants={contentFadeVariants}
-              initial="closed"
-              animate="open"
-              exit="closed"
-            >
-              {/* Top logo */}
+            <div className="flex flex-col items-center h-full pt-4 justify-between">
               <div className="flex flex-col items-center gap-4 mt-8">
                 <Icon name="chatterbox" className="w-8 h-8 text-[#C4C7C5]" />
-                {/* Toggle button */}
-                <button
-                  onClick={() => setIsOpen(true)}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-[#343639FF] rounded-lg"
-                  title="Expand"
-                >
-                  <Icon name="menu" className="w-6 h-6" />
-                </button>
-                {/* New chat */}
                 <button
                   onClick={handleCreateThread}
                   className="p-2 text-gray-400 hover:text-white hover:bg-[#343639FF] rounded-lg"
@@ -190,7 +161,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 </button>
               </div>
 
-              {/* Logout at bottom */}
               <div className="flex items-center justify-center mb-4">
                 <button
                   onClick={() => setIsLogoutModalOpen(true)}
@@ -200,7 +170,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                   <Icon name="logout" className="w-6 h-6" />
                 </button>
               </div>
-            </motion.div>
+            </div>
           )}
         </div>
       </motion.aside>
