@@ -48,8 +48,6 @@ const DashboardPage: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-900 text-white relative">
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-
-      {/* Show collapsed sidebar label */}
       {!isSidebarOpen && (
         <div className="absolute left-24 top-5 text-[#C4C7C5] font-bold text-xl select-none">
           ChatterBox

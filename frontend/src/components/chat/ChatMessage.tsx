@@ -154,15 +154,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         className={`flex items-start gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}
         style={{ maxWidth: "70%" }}
       >
-        {/* Avatar */}
         <div
           className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-600"
           aria-label={isUser ? "User avatar" : "Bot avatar"}
         >
           <Icon name={isUser ? "user" : "chatterbox"} className="w-5 h-5" />
         </div>
-
-        {/* Message bubble */}
         <div
           className="rounded-xl"
           style={{

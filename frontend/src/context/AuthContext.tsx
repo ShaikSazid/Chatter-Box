@@ -16,7 +16,7 @@ interface AuthContextType {
   signup: (userData: any) => Promise<void>;
   logout: () => void;
 }
-// FIX: Export AuthContext to resolve import error in hooks/useAuth.ts
+
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
 );
@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const navigate = useNavigate();
   const verifyUser = useCallback(async () => {
   try {
-    const { data } = await api.get("/auth/verify"); // cookie sent automatically
+    const { data } = await api.get("/auth/verify");
     setUser(data.user);
     setIsAuthenticated(true);
   } catch (error) {

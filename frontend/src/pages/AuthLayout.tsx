@@ -1,7 +1,7 @@
 // src/pages/AuthLayout.tsx
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import Icon from '../components/ui/Icon'; // Import Icon
+import Icon from '../components/ui/Icon'; 
 import { motion } from 'framer-motion';
 
 const AuthLayout: React.FC = () => {
@@ -10,14 +10,12 @@ const AuthLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white p-4">
-      {/* Optional: Add subtle background shapes/gradients if desired */}
       <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="w-full max-w-sm" // Slightly smaller max-width
+          className="w-full max-w-sm" 
       >
-        {/* Logo and Title */}
         <div className="text-center mb-8">
             <Icon name="logo" className="w-12 h-12 text-blue-500 mx-auto mb-3" />
             <h1 className="text-3xl font-bold tracking-tight text-gray-100">ChatterBox</h1>
@@ -25,13 +23,9 @@ const AuthLayout: React.FC = () => {
                 {isLoginPage ? "Welcome back! Sign in to continue." : "Create your account."}
             </p>
         </div>
-
-        {/* Form Container */}
         <div className="bg-gray-800/50 backdrop-blur-md rounded-xl p-8 border border-gray-700/50 shadow-lg">
-          <Outlet /> {/* Renders LoginPage or SignupPage */}
+          <Outlet /> 
         </div>
-
-        {/* Footer Link */}
         <div className="mt-6 text-center text-sm">
           {isLoginPage ? (
             <p className="text-gray-400">

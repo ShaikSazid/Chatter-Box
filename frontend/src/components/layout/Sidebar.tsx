@@ -39,7 +39,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     setIsLogoutModalOpen(false);
   };
 
-  // Sidebar animation variants
   const sidebarVariants = {
     open: { width: '18rem', transition: { duration: 0.1, ease: 'easeInOut' } },
     closed: { width: '5rem', transition: { duration: 0.1, ease: 'easeInOut' } },
@@ -58,21 +57,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       <motion.aside
         variants={sidebarVariants}
         animate={isOpen ? 'open' : 'closed'}
-        onMouseEnter={() => setIsOpen(true)} // expand on hover
+        onMouseEnter={() => setIsOpen(true)} 
         className="flex flex-col p-2 border-r border-white/10 relative transition-all"
         style={{ backgroundColor: '#292A2D', fontFamily: 'Helvetica Neue, sans-serif' }}
       >
         <div className="h-full flex flex-col overflow-hidden">
           {isOpen ? (
             <div className="flex flex-col h-full">
-              {/* Header */}
               <div className="flex items-center justify-between p-2 mb-2">
                 <div className="flex items-center gap-2">
                   <Icon name="chatterbox" className="w-6 h-6 text-[#C4C7C5]" />
                   <span className="font-bold text-xl text-[#C4C7C5]">ChatterBox</span>
                 </div>
                 <button
-                  onClick={() => setIsOpen(false)} // toggle button closes sidebar
+                  onClick={() => setIsOpen(false)} 
                   className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-[#343639FF]"
                   title="Collapse"
                 >
@@ -80,7 +78,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 </button>
               </div>
 
-              {/* New Chat Button */}
               <div className="p-2 mb-2">
                 <button
                   onClick={handleCreateThread}
@@ -91,7 +88,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 </button>
               </div>
 
-              {/* Chat Threads */}
               <div className="flex-1 overflow-y-auto pr-2 -mr-2 custom-scrollbar">
                 <nav className="flex flex-col gap-1">
                   {threads.map((thread) => (
@@ -131,7 +127,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 </nav>
               </div>
 
-              {/* Profile Section */}
               <div className="mt-auto p-2">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-600 text-white font-bold text-lg">
@@ -174,8 +169,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           )}
         </div>
       </motion.aside>
-
-      {/* Delete Thread Modal */}
       <Modal isOpen={!!threadToDelete} onClose={() => setThreadToDelete(null)} title="Delete Chat?">
         <p className="text-gray-400 mb-6">
           Are you sure you want to delete this chat history? This action cannot be undone.
@@ -189,8 +182,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           </Button>
         </div>
       </Modal>
-
-      {/* Logout Modal */}
       <Modal isOpen={isLogoutModalOpen} onClose={() => setIsLogoutModalOpen(false)} title="Confirm Logout">
         <p className="text-gray-400 mb-6">Are you sure you want to log out?</p>
         <div className="flex justify-end gap-4">

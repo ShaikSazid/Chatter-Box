@@ -35,7 +35,6 @@ const SignupPage: React.FC = () => {
       onSubmit={handleSubmit(onSubmit)}
       noValidate
     >
-      {/* ✅ Fixed JSX error */}
       <AnimatePresence>
         {apiError && (
           <motion.p

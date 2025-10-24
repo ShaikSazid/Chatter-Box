@@ -11,8 +11,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 const id = useId();
 const [isFocused, setIsFocused] = useState(false);
 
-// Determine if the label should float
-// It should float if the input is focused, has a value, or is a date/time input (which always have content visible)
 const isFloating = isFocused || props.value || props.defaultValue || ['date', 'datetime-local', 'month', 'time', 'week'].includes(type);
 
 return (
