@@ -33,6 +33,10 @@ app.use(cookieParser());
 
 connectToDB();
 
+app.get("/", (req, res) => {
+  res.send("Server is running man");
+});
+
 app.use("/auth", authRoutes);
 app.use("/threads", threadRoutes);
 app.use("/messages", messageRoutes);
