@@ -69,7 +69,7 @@ const DashboardPage: React.FC = () => {
               </>
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
-                <Icon name="bot" className="w-24 h-24 mb-4" />
+                <Icon name="chatterbox" className="w-24 h-24 mb-4" />
                 <h2 className="text-2xl font-semibold">Welcome to ChatterBox</h2>
                 <p className="mt-2">
                   Create a new chat or select an existing one from the sidebar to get started.

@@ -11,11 +11,6 @@ const buildGeminiHistory = (messages) => {
     }));
 };
 
-/**
- * Gets a chat response from the Gemini API.
- * @param {Array<object>} messages - The conversation history.
- * @returns {Promise<string>} - The assistant's response text.
- */
 export const getAiResponse = async (messages) => {
     try {
         const history = buildGeminiHistory(messages.slice(0, -1)); 
