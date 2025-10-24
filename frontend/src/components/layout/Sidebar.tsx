@@ -4,7 +4,7 @@ import { useChat } from '../../context/ChatContext';
 import Icon from '../ui/Icon';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -39,9 +39,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     setIsLogoutModalOpen(false);
   };
 
-  const sidebarVariants = {
-    open: { width: '18rem', transition: { duration: 0.1, ease: 'easeInOut' } },
-    closed: { width: '5rem', transition: { duration: 0.1, ease: 'easeInOut' } },
+  const sidebarVariants: Variants = {
+    open: { width: '18rem', transition: { duration: 0.1, ease: [0.42, 0, 0.58, 1] } },
+    closed: { width: '5rem', transition: { duration: 0.1, ease: [0.42, 0, 0.58, 1] } },
   };
 
   if (isLoading) {
@@ -57,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
       <motion.aside
         variants={sidebarVariants}
         animate={isOpen ? 'open' : 'closed'}
-        onMouseEnter={() => setIsOpen(true)} 
+        onMouseEnter={() => setIsOpen(true)}
         className="flex flex-col p-2 border-r border-white/10 relative transition-all"
         style={{ backgroundColor: '#292A2D', fontFamily: 'Helvetica Neue, sans-serif' }}
       >
@@ -70,7 +70,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                   <span className="font-bold text-xl text-[#C4C7C5]">ChatterBox</span>
                 </div>
                 <button
-                  onClick={() => setIsOpen(false)} 
+                  onClick={() => setIsOpen(false)}
                   className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-[#343639FF]"
                   title="Collapse"
                 >
@@ -132,7 +132,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                   <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-600 text-white font-bold text-lg">
                     {user?.username ? user.username.charAt(0).toUpperCase() : 'U'}
                   </div>
-                  <span className="font-semibold text-lg flex-1 truncate text-[#C4C7C5]">{user?.username}</span>
+                  <span className="font-semibold text-lg flex-1 truncate text-[#C4C7C5]">
+                    {user?.username}
+                  </span>
                   <button
                     onClick={() => setIsLogoutModalOpen(true)}
                     className="p-2 text-gray-400 hover:text-white"
@@ -169,6 +171,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           )}
         </div>
       </motion.aside>
+
       <Modal isOpen={!!threadToDelete} onClose={() => setThreadToDelete(null)} title="Delete Chat?">
         <p className="text-gray-400 mb-6">
           Are you sure you want to delete this chat history? This action cannot be undone.
@@ -182,6 +185,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           </Button>
         </div>
       </Modal>
+
       <Modal isOpen={isLogoutModalOpen} onClose={() => setIsLogoutModalOpen(false)} title="Confirm Logout">
         <p className="text-gray-400 mb-6">Are you sure you want to log out?</p>
         <div className="flex justify-end gap-4">

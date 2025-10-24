@@ -59,25 +59,32 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ inline, className, children, isUs
 };
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
-  if (!message) return null;
-
-  const isUser = message.role === "user";
+  const isUser = message?.role === "user";
 
   const parsedContent = useMemo(() => {
+    if (!message) return null; // handle undefined message
+
     return (
       <ReactMarkdown
         children={message.content || ""}
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSanitize]}
         components={{
-          code: ({ inline, className, children }) => (
-            <CodeBlock
-              inline={!!inline}
-              className={className || undefined}
-              isUser={isUser}
-              children={Array.isArray(children) ? children : [children]}
-            />
-          ),
+          code: (props) => {
+            const { inline, className, children } = props as unknown as {
+              inline: boolean;
+              className?: string;
+              children: string | string[];
+            };
+            return (
+              <CodeBlock
+                inline={inline}
+                className={className}
+                isUser={isUser}
+                children={Array.isArray(children) ? children : [children]}
+              />
+            );
+          },
           strong: ({ children }) => (
             <span
               className="rounded px-1 py-0.5 font-semibold"
@@ -89,38 +96,20 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
               {children}
             </span>
           ),
-          p: ({ children }) => (
-            <p className="break-words whitespace-pre-wrap leading-relaxed">{children}</p>
-          ),
+          p: ({ children }) => <p className="break-words whitespace-pre-wrap leading-relaxed">{children}</p>,
           a: ({ href, children }) => (
-            <a
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-400 underline"
-            >
+            <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">
               {children}
             </a>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-gray-500 pl-4 italic text-gray-400 my-2">
-              {children}
-            </blockquote>
+            <blockquote className="border-l-4 border-gray-500 pl-4 italic text-gray-400 my-2">{children}</blockquote>
           ),
-          ul: ({ children }) => (
-            <ul className="list-disc list-inside mb-2 text-gray-200 space-y-0.5">{children}</ul>
-          ),
-          ol: ({ children }) => (
-            <ol className="list-decimal list-inside mb-2 text-gray-200 space-y-0.5">{children}</ol>
-          ),
+          ul: ({ children }) => <ul className="list-disc list-inside mb-2 text-gray-200 space-y-0.5">{children}</ul>,
+          ol: ({ children }) => <ol className="list-decimal list-inside mb-2 text-gray-200 space-y-0.5">{children}</ol>,
           li: ({ children }) => <li className="leading-snug">{children}</li>,
           img: ({ alt, src }) => (
-            <img
-              src={src}
-              alt={alt}
-              loading="lazy"
-              style={{ maxWidth: "100%", borderRadius: 8, margin: "0.25rem 0" }}
-            />
+            <img src={src} alt={alt} loading="lazy" style={{ maxWidth: "100%", borderRadius: 8, margin: "0.25rem 0" }} />
           ),
           table: ({ children }) => (
             <div className="overflow-x-auto scrollbar-modern mb-3 rounded-md border border-gray-600">
@@ -135,13 +124,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           tr: ({ children }) => (
             <tr className="border-b border-gray-600 last:border-0 hover:bg-gray-800">{children}</tr>
           ),
-          td: ({ children }) => (
-            <td className="border border-gray-600 px-2 py-1 align-top">{children}</td>
-          ),
+          td: ({ children }) => <td className="border border-gray-600 px-2 py-1 align-top">{children}</td>,
         }}
       />
     );
-  }, [message.content, isUser]);
+  }, [message, isUser]);
+
+  if (!message) return null;
 
   return (
     <div
@@ -150,10 +139,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       role="listitem"
       tabIndex={0}
     >
-      <div
-        className={`flex items-start gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}
-        style={{ maxWidth: "70%" }}
-      >
+      <div className={`flex items-start gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`} style={{ maxWidth: "70%" }}>
         <div
           className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full bg-gray-600"
           aria-label={isUser ? "User avatar" : "Bot avatar"}
