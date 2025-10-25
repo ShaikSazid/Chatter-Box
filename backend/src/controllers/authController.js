@@ -5,9 +5,10 @@ import env from "../config/config.js";
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production", 
-  sameSite: "lax",
-  maxAge: 7 * 24 * 60 * 60 * 1000, 
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 };
+
 
 export const signup = async (req, res, next) => {
   try {

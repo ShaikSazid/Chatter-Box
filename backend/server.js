@@ -13,20 +13,18 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 const allowedOrigins = [
-  "http://localhost:5173",        
-  process.env.CLIENT_URL || ""    
-];
+  "http://localhost:5173",
+  process.env.CLIENT_URL, 
+].filter(Boolean);
 
 app.use(cors({
-  origin: function(origin, callback) {
+  origin: (origin, callback) => {
     if (!origin) return callback(null, true); 
-    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (allowedOrigins.some(o => origin.startsWith(o))) return callback(null, true);
     callback(new Error(`CORS blocked for origin ${origin}`));
   },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true
+  credentials: true,
 }));
-
 
 app.use(express.json());
 app.use(cookieParser());
