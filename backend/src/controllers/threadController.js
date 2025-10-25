@@ -16,7 +16,9 @@ export const getThread = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
-    const thread = await Thread.findOne({ _id: id, userId }).populate("messages");
+    const thread = await Thread.findOne({ _id: id, userId }).populate(
+      "messages"
+    );
     if (!thread) return res.status(404).json({ msg: "Thread not found" });
     res.status(200).json(thread);
   } catch (err) {
@@ -41,7 +43,9 @@ export const deleteThread = async (req, res, next) => {
     const userId = req.user.id;
     const result = await Thread.deleteOne({ _id: id, userId });
     if (result.deletedCount === 0)
-      return res.status(404).json({ msg: "Thread not found or not authorized" });
+      return res
+        .status(404)
+        .json({ msg: "Thread not found or not authorized" });
     return res.status(200).json({ msg: "Thread deleted" });
   } catch (err) {
     next(err);

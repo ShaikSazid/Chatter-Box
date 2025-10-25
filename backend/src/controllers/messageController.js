@@ -8,20 +8,12 @@ export const sendMessage = async (req, res, next) => {
     if (!threadId) {
       return res.status(400).json({ msg: "threadId is required" });
     }
-
     const thread = await Thread.findOne({ _id: threadId, userId: req.user.id });
     if (!thread) return res.status(404).json({ msg: "Thread not found" });
-
     const isNewChat = thread.messages.length === 0;
-
-    // Add user message
     thread.messages.push({ role: "user", content });
-
-    // Get AI response
     const assistantResponse = await getAiResponse(thread.messages);
     thread.messages.push({ role: "assistant", content: assistantResponse });
-
-    // Generate title if first message
     if (isNewChat) {
       const title = await generateTitle(content, assistantResponse);
       thread.title = title;
@@ -31,9 +23,8 @@ export const sendMessage = async (req, res, next) => {
 
     res.status(200).json({
       assistantResponse,
-      newTitle: isNewChat ? thread.title : null
+      newTitle: isNewChat ? thread.title : null,
     });
-
   } catch (err) {
     next(err);
   }
